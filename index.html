@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Analisis Pengeluaran Mahasiswa</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      margin: 24px;
+      max-width: 800px;
+    }
+
+    input, select, button {
+      padding: 8px;
+      margin: 4px;
+    }
+
+    #list, #result {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 10px;
+      white-space: pre-line;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Analisis Pengeluaran Harian Mahasiswa</h2>
+
+<p>Masukkan data pengeluaran harian mahasiswa.</p>
+
+<input id="nama" placeholder="Nama Pengeluaran">
+
+<select id="kategori">
+  <option value="">Pilih Kategori</option>
+  <option>Makanan</option>
+  <option>Transport</option>
+  <option>Hiburan</option>
+  <option>Belanja</option>
+  <option>Lainnya</option>
+</select>
+
+<input id="jumlah" type="number" placeholder="Jumlah Pengeluaran">
+
+<button onclick="tambah()">Tambah</button>
+<button onclick="analisis()">Analisis</button>
+
+<h3>Total Pengeluaran:</h3>
+<p id="total">Rp 0</p>
+
+<h3>Data Pengeluaran:</h3>
+
+<div id="list">
+Belum ada data
+</div>
+
+<h3>Hasil Analisis:</h3>
+
+<div id="result">
+Belum dianalisis
+</div>
+
+<script>
+
+let data = [];
+
+function formatRupiah(angka) {
+  return "Rp " + angka.toLocaleString("id-ID");
+}
+
+function render() {
+
+  let total = 0;
+
+  if (data.length === 0) {
+    document.getElementById("list").innerHTML =
+      "Belum ada data";
+
+    document.getElementById("total").innerText =
+      "Rp 0";
+
+    return;
+  }
+
+  let html = `
+    <table>
+      <tr>
+        <th>No</th>
+        <th>Nama</th>
+        <th>Kategori</th>
+        <th>Jumlah</th>
+      </tr>
+  `;
+
+  data.forEach((d, i) => {
+
+    total += d.jumlah;
+
+    html += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${d.nama}</td>
+        <td>${d.kategori}</td>
+        <td>${formatRupiah(d.jumlah)}</td>
+      </tr>
+    `;
+  });
+
+  html += `</table>`;
+
+  document.getElementById("list").innerHTML = html;
+
+  document.getElementById("total").innerText =
+    formatRupiah(total);
+}
+
+function tambah() {
+
+  const nama =
+    document.getElementById("nama").value.trim();
+
+  const kategori =
+    document.getElementById("kategori").value;
+
+  const jumlah =
+    Number(document.getElementById("jumlah").value);
+
+  if (!nama || !kategori || !jumlah) {
+    alert("Isi semua data");
+    return;
+  }
+
+  data.push({
+    nama,
+    kategori,
+    jumlah
+  });
+
+  document.getElementById("nama").value = "";
+  document.getElementById("kategori").value = "";
+  document.getElementById("jumlah").value = "";
+
+  render();
+}
+
+function analisis() {
+
+  if (data.length === 0) {
+    alert("Belum ada data");
+    return;
+  }
+
+  let total = 0;
+
+  let kategoriTerbesar = "";
+  let terbesar = 0;
+
+  data.forEach(d => {
+
+    total += d.jumlah;
+
+    if (d.jumlah > terbesar) {
+      terbesar = d.jumlah;
+      kategoriTerbesar = d.kategori;
+    }
+  });
+
+  let status = "";
+
+  if (total < 50000) {
+    status = "Hemat";
+  }
+  else if (total <= 100000) {
+    status = "Sedang";
+  }
+  else {
+    status = "Boros";
+  }
+
+  const hasil = `
+Total Pengeluaran: ${formatRupiah(total)}
+
+Kategori Pengeluaran Terbesar:
+${kategoriTerbesar} (${formatRupiah(terbesar)})
+
+Status Pengeluaran:
+${status}
+
+Saran:
+${status === "Boros"
+? "Kurangi pengeluaran yang tidak terlalu penting."
+: "Pengeluaran masih cukup terkontrol."}
+  `;
+
+  document.getElementById("result").innerText =
+    hasil;
+}
+
+render();
+
+</script>
+
+</body>
+</html>
