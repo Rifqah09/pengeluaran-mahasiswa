@@ -5,6 +5,7 @@
   <title>Analisis Pengeluaran Mahasiswa</title>
 
   <style>
+
     body {
       font-family: Arial;
       margin: 24px;
@@ -37,6 +38,15 @@
       padding: 8px;
       text-align: left;
     }
+
+    #aiImage {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: none;
+      max-width: 400px;
+    }
+
   </style>
 </head>
 
@@ -57,12 +67,20 @@
   <option>Lainnya</option>
 </select>
 
-<input id="jumlah" type="number" placeholder="Jumlah Pengeluaran">
+<input
+  id="jumlah"
+  type="number"
+  placeholder="Jumlah Pengeluaran"
+>
 
 <button onclick="tambah()">Tambah</button>
-<button onclick="analisis()">Analisis</button>
+
+<button onclick="analisis()">
+  Analisis
+</button>
 
 <h3>Total Pengeluaran:</h3>
+
 <p id="total">Rp 0</p>
 
 <h3>Data Pengeluaran:</h3>
@@ -77,12 +95,18 @@ Belum ada data
 Belum dianalisis
 </div>
 
+<h3>AI Image:</h3>
+
+<img id="aiImage">
+
 <script>
 
 let data = [];
 
 function formatRupiah(angka) {
-  return "Rp " + angka.toLocaleString("id-ID");
+
+  return "Rp " +
+    angka.toLocaleString("id-ID");
 }
 
 function render() {
@@ -90,6 +114,7 @@ function render() {
   let total = 0;
 
   if (data.length === 0) {
+
     document.getElementById("list").innerHTML =
       "Belum ada data";
 
@@ -125,7 +150,8 @@ function render() {
 
   html += `</table>`;
 
-  document.getElementById("list").innerHTML = html;
+  document.getElementById("list").innerHTML =
+    html;
 
   document.getElementById("total").innerText =
     formatRupiah(total);
@@ -134,16 +160,24 @@ function render() {
 function tambah() {
 
   const nama =
-    document.getElementById("nama").value.trim();
+    document.getElementById("nama")
+    .value
+    .trim();
 
   const kategori =
-    document.getElementById("kategori").value;
+    document.getElementById("kategori")
+    .value;
 
   const jumlah =
-    Number(document.getElementById("jumlah").value);
+    Number(
+      document.getElementById("jumlah")
+      .value
+    );
 
   if (!nama || !kategori || !jumlah) {
+
     alert("Isi semua data");
+
     return;
   }
 
@@ -160,16 +194,19 @@ function tambah() {
   render();
 }
 
-function analisis() {
+async function analisis() {
 
   if (data.length === 0) {
+
     alert("Belum ada data");
+
     return;
   }
 
   let total = 0;
 
   let kategoriTerbesar = "";
+
   let terbesar = 0;
 
   data.forEach(d => {
@@ -177,7 +214,9 @@ function analisis() {
     total += d.jumlah;
 
     if (d.jumlah > terbesar) {
+
       terbesar = d.jumlah;
+
       kategoriTerbesar = d.kategori;
     }
   });
@@ -185,32 +224,88 @@ function analisis() {
   let status = "";
 
   if (total < 50000) {
+
     status = "Hemat";
   }
   else if (total <= 100000) {
+
     status = "Sedang";
   }
   else {
+
     status = "Boros";
   }
 
   const hasil = `
-Total Pengeluaran: ${formatRupiah(total)}
+Total Pengeluaran:
+${formatRupiah(total)}
 
 Kategori Pengeluaran Terbesar:
-${kategoriTerbesar} (${formatRupiah(terbesar)})
+${kategoriTerbesar}
+(${formatRupiah(terbesar)})
 
-Status Pengeluaran:
+Status:
 ${status}
 
 Saran:
-${status === "Boros"
-? "Kurangi pengeluaran yang tidak terlalu penting."
-: "Pengeluaran masih cukup terkontrol."}
+${
+  status === "Boros"
+  ? "Kurangi pengeluaran tidak penting."
+  : "Pengeluaran masih cukup terkontrol."
+}
   `;
 
   document.getElementById("result").innerText =
     hasil;
+
+  // ============================
+  // REQUEST KE BACKEND AI
+  // ============================
+
+  try {
+
+    const response = await fetch(
+      "https://student-expense-analyzer-backend.vercel.app/api/generate-images",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          expenses: hasil
+        })
+      }
+    );
+
+    const aiData =
+      await response.json();
+
+    if (aiData.image) {
+
+      const img =
+        document.getElementById("aiImage");
+
+      img.src =
+        `data:image/png;base64,${aiData.image}`;
+
+      img.style.display = "block";
+    }
+    else {
+
+      console.log(aiData);
+
+      alert("AI image gagal dibuat");
+    }
+
+  }
+  catch (error) {
+
+    console.log(error);
+
+    alert("Gagal terhubung ke backend AI");
+  }
 }
 
 render();
