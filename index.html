@@ -5,7 +5,6 @@
   <title>Analisis Pengeluaran Mahasiswa</title>
 
   <style>
-
     body {
       font-family: Arial;
       margin: 24px;
@@ -46,15 +45,12 @@
       display: none;
       max-width: 400px;
     }
-
   </style>
 </head>
 
 <body>
 
 <h2>Analisis Pengeluaran Harian Mahasiswa</h2>
-
-<p>Masukkan data pengeluaran harian mahasiswa.</p>
 
 <input id="nama" placeholder="Nama Pengeluaran">
 
@@ -67,36 +63,21 @@
   <option>Lainnya</option>
 </select>
 
-<input
-  id="jumlah"
-  type="number"
-  placeholder="Jumlah Pengeluaran"
->
+<input id="jumlah" type="number" placeholder="Jumlah">
 
 <button onclick="tambah()">Tambah</button>
+<button onclick="analisis()">Analisis</button>
 
-<button onclick="analisis()">
-  Analisis
-</button>
-
-<h3>Total Pengeluaran:</h3>
-
+<h3>Total:</h3>
 <p id="total">Rp 0</p>
 
-<h3>Data Pengeluaran:</h3>
+<h3>Data:</h3>
+<div id="list">Belum ada data</div>
 
-<div id="list">
-Belum ada data
-</div>
-
-<h3>Hasil Analisis:</h3>
-
-<div id="result">
-Belum dianalisis
-</div>
+<h3>Hasil:</h3>
+<div id="result">Belum dianalisis</div>
 
 <h3>AI Image:</h3>
-
 <img id="aiImage">
 
 <script>
@@ -104,43 +85,26 @@ Belum dianalisis
 let data = [];
 
 function formatRupiah(angka) {
-
-  return "Rp " +
-    angka.toLocaleString("id-ID");
+  return "Rp " + angka.toLocaleString("id-ID");
 }
 
 function render() {
-
   let total = 0;
 
   if (data.length === 0) {
-
-    document.getElementById("list").innerHTML =
-      "Belum ada data";
-
-    document.getElementById("total").innerText =
-      "Rp 0";
-
+    document.getElementById("list").innerHTML = "Belum ada data";
+    document.getElementById("total").innerText = "Rp 0";
     return;
   }
 
-  let html = `
-    <table>
-      <tr>
-        <th>No</th>
-        <th>Nama</th>
-        <th>Kategori</th>
-        <th>Jumlah</th>
-      </tr>
-  `;
+  let html = "<table><tr><th>No</th><th>Nama</th><th>Kategori</th><th>Jumlah</th></tr>";
 
   data.forEach((d, i) => {
-
     total += d.jumlah;
 
     html += `
       <tr>
-        <td>${i + 1}</td>
+        <td>${i+1}</td>
         <td>${d.nama}</td>
         <td>${d.kategori}</td>
         <td>${formatRupiah(d.jumlah)}</td>
@@ -148,44 +112,23 @@ function render() {
     `;
   });
 
-  html += `</table>`;
+  html += "</table>";
 
-  document.getElementById("list").innerHTML =
-    html;
-
-  document.getElementById("total").innerText =
-    formatRupiah(total);
+  document.getElementById("list").innerHTML = html;
+  document.getElementById("total").innerText = formatRupiah(total);
 }
 
 function tambah() {
-
-  const nama =
-    document.getElementById("nama")
-    .value
-    .trim();
-
-  const kategori =
-    document.getElementById("kategori")
-    .value;
-
-  const jumlah =
-    Number(
-      document.getElementById("jumlah")
-      .value
-    );
+  const nama = document.getElementById("nama").value.trim();
+  const kategori = document.getElementById("kategori").value;
+  const jumlah = Number(document.getElementById("jumlah").value);
 
   if (!nama || !kategori || !jumlah) {
-
     alert("Isi semua data");
-
     return;
   }
 
-  data.push({
-    nama,
-    kategori,
-    jumlah
-  });
+  data.push({ nama, kategori, jumlah });
 
   document.getElementById("nama").value = "";
   document.getElementById("kategori").value = "";
@@ -197,114 +140,59 @@ function tambah() {
 async function analisis() {
 
   if (data.length === 0) {
-
     alert("Belum ada data");
-
     return;
   }
 
   let total = 0;
-
+  let terbesar = 0;
   let kategoriTerbesar = "";
 
-  let terbesar = 0;
-
   data.forEach(d => {
-
     total += d.jumlah;
-
     if (d.jumlah > terbesar) {
-
       terbesar = d.jumlah;
-
       kategoriTerbesar = d.kategori;
     }
   });
 
-  let status = "";
-
-  if (total < 50000) {
-
-    status = "Hemat";
-  }
-  else if (total <= 100000) {
-
-    status = "Sedang";
-  }
-  else {
-
-    status = "Boros";
-  }
+  let status = total < 50000 ? "Hemat"
+              : total <= 100000 ? "Sedang"
+              : "Boros";
 
   const hasil = `
-Total Pengeluaran:
-${formatRupiah(total)}
-
-Kategori Pengeluaran Terbesar:
-${kategoriTerbesar}
-(${formatRupiah(terbesar)})
-
-Status:
-${status}
-
-Saran:
-${
-  status === "Boros"
-  ? "Kurangi pengeluaran tidak penting."
-  : "Pengeluaran masih cukup terkontrol."
-}
+Total: ${formatRupiah(total)}
+Kategori terbesar: ${kategoriTerbesar} (${formatRupiah(terbesar)})
+Status: ${status}
   `;
 
-  document.getElementById("result").innerText =
-    hasil;
-
-  // ============================
-  // REQUEST KE BACKEND AI
-  // ============================
+  document.getElementById("result").innerText = hasil;
 
   try {
 
-    const response = await fetch(
-      "https://student-expense-analyzer-backhend.vercel.app/api/generate-image",
+    const res = await fetch(
+      "https://student-expense-analyzer-backend.vercel.app/api/generate-image",
       {
         method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          expenses: hasil
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expenses: hasil })
       }
     );
 
-    const aiData =
-      await response.json();
+    const aiData = await res.json();
+
+    console.log(aiData);
 
     if (aiData.image) {
-
-      const img =
-        document.getElementById("aiImage");
-
-      img.src =
-        `data:image/png;base64,${aiData.image}`;
-
+      const img = document.getElementById("aiImage");
+      img.src = `data:image/png;base64,${aiData.image}`;
       img.style.display = "block";
-    }
-    else {
-
-      console.log(aiData);
-
-      alert("AI image gagal dibuat");
+    } else {
+      alert("❌ " + (aiData.error || "AI gagal"));
     }
 
-  }
-  catch (error) {
-
-    console.log(error);
-
-    alert("Gagal terhubung ke backend AI");
+  } catch (err) {
+    alert("❌ Tidak bisa konek ke backend");
   }
 }
 
