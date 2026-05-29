@@ -1,25 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
   <meta charset="utf-8">
   <title>Analisis Pengeluaran Mahasiswa</title>
 
   <style>
+
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       margin: 24px;
-      max-width: 800px;
+      max-width: 900px;
+      background: #f5f5f5;
+    }
+
+    h2 {
+      color: #333;
     }
 
     input, select, button {
-      padding: 8px;
-      margin: 4px;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
-    #list, #result {
-      border: 1px solid #ddd;
-      padding: 10px;
+    button {
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    #list,
+    #result {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
       margin-top: 10px;
+      border: 1px solid #ddd;
       white-space: pre-line;
     }
 
@@ -27,24 +49,37 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      background: white;
     }
 
     table, th, td {
       border: 1px solid #ccc;
     }
 
+    th {
+      background: #f0f0f0;
+    }
+
     th, td {
-      padding: 8px;
+      padding: 10px;
       text-align: left;
     }
 
     #aiImage {
       margin-top: 20px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      display: none;
+      width: 100%;
       max-width: 400px;
+      border-radius: 12px;
+      display: none;
+      border: 2px solid #ddd;
     }
+
+    #loading {
+      display: none;
+      margin-top: 10px;
+      color: #555;
+    }
+
   </style>
 </head>
 
@@ -66,7 +101,7 @@
 <input id="jumlah" type="number" placeholder="Jumlah">
 
 <button onclick="tambah()">Tambah</button>
-<button onclick="analisis()">Analisis</button>
+<button onclick="analisis()">Analisis AI</button>
 
 <h3>Total:</h3>
 <p id="total">Rp 0</p>
@@ -74,8 +109,12 @@
 <h3>Data:</h3>
 <div id="list">Belum ada data</div>
 
-<h3>Hasil:</h3>
+<h3>Hasil Analisis AI:</h3>
 <div id="result">Belum dianalisis</div>
+
+<div id="loading">
+  ⏳ Sedang menganalisis dan membuat gambar AI...
+</div>
 
 <h3>AI Image:</h3>
 <img id="aiImage">
@@ -89,22 +128,30 @@ function formatRupiah(angka) {
 }
 
 function render() {
+
   let total = 0;
 
   if (data.length === 0) {
-    document.getElementById("list").innerHTML = "Belum ada data";
-    document.getElementById("total").innerText = "Rp 0";
+
+    document.getElementById("list").innerHTML =
+      "Belum ada data";
+
+    document.getElementById("total").innerText =
+      "Rp 0";
+
     return;
   }
 
-  let html = "<table><tr><th>No</th><th>Nama</th><th>Kategori</th><th>Jumlah</th></tr>";
+  let html =
+    "<table><tr><th>No</th><th>Nama</th><th>Kategori</th><th>Jumlah</th></tr>";
 
   data.forEach((d, i) => {
+
     total += d.jumlah;
 
     html += `
       <tr>
-        <td>${i+1}</td>
+        <td>${i + 1}</td>
         <td>${d.nama}</td>
         <td>${d.kategori}</td>
         <td>${formatRupiah(d.jumlah)}</td>
@@ -115,20 +162,33 @@ function render() {
   html += "</table>";
 
   document.getElementById("list").innerHTML = html;
-  document.getElementById("total").innerText = formatRupiah(total);
+
+  document.getElementById("total").innerText =
+    formatRupiah(total);
 }
 
 function tambah() {
-  const nama = document.getElementById("nama").value.trim();
-  const kategori = document.getElementById("kategori").value;
-  const jumlah = Number(document.getElementById("jumlah").value);
+
+  const nama =
+    document.getElementById("nama").value.trim();
+
+  const kategori =
+    document.getElementById("kategori").value;
+
+  const jumlah =
+    Number(document.getElementById("jumlah").value);
 
   if (!nama || !kategori || !jumlah) {
+
     alert("Isi semua data");
     return;
   }
 
-  data.push({ nama, kategori, jumlah });
+  data.push({
+    nama,
+    kategori,
+    jumlah
+  });
 
   document.getElementById("nama").value = "";
   document.getElementById("kategori").value = "";
@@ -140,59 +200,127 @@ function tambah() {
 async function analisis() {
 
   if (data.length === 0) {
+
     alert("Belum ada data");
     return;
   }
+
+  const loading =
+    document.getElementById("loading");
+
+  loading.style.display = "block";
 
   let total = 0;
   let terbesar = 0;
   let kategoriTerbesar = "";
 
   data.forEach(d => {
+
     total += d.jumlah;
+
     if (d.jumlah > terbesar) {
+
       terbesar = d.jumlah;
       kategoriTerbesar = d.kategori;
     }
   });
 
-  let status = total < 50000 ? "Hemat"
-              : total <= 100000 ? "Sedang"
-              : "Boros";
+  const status =
+    total < 50000 ? "Hemat"
+    : total <= 100000 ? "Sedang"
+    : "Boros";
 
   const hasil = `
-Total: ${formatRupiah(total)}
-Kategori terbesar: ${kategoriTerbesar} (${formatRupiah(terbesar)})
-Status: ${status}
-  `;
+Total Pengeluaran: ${formatRupiah(total)}
 
-  document.getElementById("result").innerText = hasil;
+Kategori Terbesar:
+${kategoriTerbesar}
+(${formatRupiah(terbesar)})
+
+Status:
+${status}
+`;
 
   try {
 
-    const res = await fetch(
-      "https://student-expense-analyzer-backend.vercel.app/api/generate-images",
+    // ANALISIS GEMINI
+    const analisisRes = await fetch(
+      "https://student-expense-analyzer-backend.vercel.app/api/analyze",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ expenses: hasil })
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          activities: hasil
+        })
       }
     );
 
-    const aiData = await res.json();
+    const analisisData =
+      await analisisRes.json();
 
-    console.log(aiData);
+    if (analisisData.result) {
 
-    if (aiData.image) {
-      const img = document.getElementById("aiImage");
-      img.src = `data:image/png;base64,${aiData.image}`;
-      img.style.display = "block";
+      document.getElementById("result").innerText =
+        analisisData.result;
+
     } else {
-      alert("❌ " + (aiData.error || "AI gagal"));
+
+      document.getElementById("result").innerText =
+        analisisData.error || "AI gagal menganalisis";
+    }
+
+    // GENERATE IMAGE
+    const imageRes = await fetch(
+      "https://student-expense-analyzer-backend.vercel.app/api/generate-images",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          expenses: hasil
+        })
+      }
+    );
+
+    const imageData =
+      await imageRes.json();
+
+    console.log(imageData);
+
+    if (imageData.image) {
+
+      const img =
+        document.getElementById("aiImage");
+
+      // sekarang langsung URL
+      img.src = imageData.image;
+
+      img.style.display = "block";
+
+    } else {
+
+      alert(
+        "❌ " +
+        (imageData.error || "Gagal membuat gambar")
+      );
     }
 
   } catch (err) {
+
+    console.error(err);
+
     alert("❌ Tidak bisa konek ke backend");
+
+  } finally {
+
+    loading.style.display = "none";
   }
 }
 
