@@ -6,78 +6,155 @@
 
   <style>
 
-    body {
+    *{
+      box-sizing: border-box;
+    }
+
+    body{
+      margin:0;
+      padding:30px;
       font-family: Arial, sans-serif;
-      margin: 24px;
-      max-width: 900px;
-      background: #f5f5f5;
+      background:#f3f4f6;
+      color:#333;
     }
 
-    h2 {
-      color: #333;
+    .container{
+      max-width:1000px;
+      margin:auto;
     }
 
-    input, select, button {
-      padding: 10px;
-      margin: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+    .card{
+      background:white;
+      border-radius:16px;
+      padding:24px;
+      margin-bottom:20px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.08);
     }
 
-    button {
-      cursor: pointer;
-      background: #4CAF50;
-      color: white;
-      border: none;
+    h1{
+      margin-top:0;
+      color:#222;
     }
 
-    button:hover {
-      background: #45a049;
+    .form-group{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
     }
 
-    #list,
-    #result {
-      background: white;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 10px;
-      border: 1px solid #ddd;
-      white-space: pre-line;
+    input,
+    select,
+    button{
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      font-size:14px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      background: white;
+    input,
+    select{
+      flex:1;
+      min-width:180px;
     }
 
-    table, th, td {
-      border: 1px solid #ccc;
+    button{
+      border:none;
+      cursor:pointer;
+      color:white;
+      font-weight:bold;
+      transition:0.2s;
     }
 
-    th {
-      background: #f0f0f0;
+    .btn-add{
+      background:#22c55e;
     }
 
-    th, td {
-      padding: 10px;
-      text-align: left;
+    .btn-add:hover{
+      background:#16a34a;
     }
 
-    #aiImage {
-      margin-top: 20px;
-      width: 100%;
-      max-width: 400px;
-      border-radius: 12px;
-      display: none;
-      border: 2px solid #ddd;
+    .btn-analisis{
+      background:#3b82f6;
     }
 
-    #loading {
-      display: none;
-      margin-top: 10px;
-      color: #555;
+    .btn-analisis:hover{
+      background:#2563eb;
+    }
+
+    .btn-image{
+      background:#a855f7;
+      display:none;
+    }
+
+    .btn-image:hover{
+      background:#9333ea;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:15px;
+      overflow:hidden;
+      border-radius:12px;
+    }
+
+    th{
+      background:#3b82f6;
+      color:white;
+    }
+
+    th,td{
+      padding:12px;
+      border:1px solid #ddd;
+      text-align:left;
+    }
+
+    tr:nth-child(even){
+      background:#f9fafb;
+    }
+
+    #result{
+      white-space:pre-line;
+      line-height:1.7;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      font-size:14px;
+      font-weight:bold;
+      color:white;
+    }
+
+    .hemat{
+      background:#22c55e;
+    }
+
+    .sedang{
+      background:#f59e0b;
+    }
+
+    .boros{
+      background:#ef4444;
+    }
+
+    #loading{
+      display:none;
+      margin-top:15px;
+      font-weight:bold;
+      color:#555;
+    }
+
+    #aiImage{
+      margin-top:20px;
+      width:100%;
+      max-width:450px;
+      border-radius:18px;
+      display:none;
+      border:4px solid white;
+      box-shadow:0 6px 18px rgba(0,0,0,0.15);
     }
 
   </style>
@@ -85,53 +162,107 @@
 
 <body>
 
-<h2>Analisis Pengeluaran Harian Mahasiswa</h2>
+<div class="container">
 
-<input id="nama" placeholder="Nama Pengeluaran">
+  <div class="card">
 
-<select id="kategori">
-  <option value="">Pilih Kategori</option>
-  <option>Makanan</option>
-  <option>Transport</option>
-  <option>Hiburan</option>
-  <option>Belanja</option>
-  <option>Lainnya</option>
-</select>
+    <h1>Analisis Pengeluaran Mahasiswa</h1>
 
-<input id="jumlah" type="number" placeholder="Jumlah">
+    <div class="form-group">
 
-<button onclick="tambah()">Tambah</button>
-<button onclick="analisis()">Analisis AI</button>
+      <input id="nama" placeholder="Nama Pengeluaran">
 
-<h3>Total:</h3>
-<p id="total">Rp 0</p>
+      <select id="kategori">
+        <option value="">Pilih Kategori</option>
+        <option>Makanan</option>
+        <option>Transport</option>
+        <option>Hiburan</option>
+        <option>Belanja</option>
+        <option>Lainnya</option>
+      </select>
 
-<h3>Data:</h3>
-<div id="list">Belum ada data</div>
+      <input id="jumlah" type="number" placeholder="Jumlah">
 
-<h3>Hasil Analisis AI:</h3>
-<div id="result">Belum dianalisis</div>
+    </div>
 
-<div id="loading">
-  ⏳ Sedang menganalisis dan membuat gambar AI...
+    <div class="form-group">
+
+      <button class="btn-add" onclick="tambah()">
+        Tambah Data
+      </button>
+
+      <button class="btn-analisis" onclick="analisis()">
+        Analisis AI
+      </button>
+
+      <button
+        id="generateBtn"
+        class="btn-image"
+        onclick="generateImage()">
+
+        Generate AI Image
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Total Pengeluaran</h2>
+
+    <h3 id="total">Rp 0</h3>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Data Pengeluaran</h2>
+
+    <div id="list">
+      Belum ada data
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Hasil Analisis AI</h2>
+
+    <div id="result">
+      Belum dianalisis
+    </div>
+
+    <div id="loading">
+      ⏳ AI sedang bekerja...
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <h2>AI Character</h2>
+
+    <img id="aiImage">
+
+  </div>
+
 </div>
-
-<h3>AI Image:</h3>
-<img id="aiImage">
 
 <script>
 
 let data = [];
+let hasilAnalisis = "";
 
-function formatRupiah(angka) {
+function formatRupiah(angka){
   return "Rp " + angka.toLocaleString("id-ID");
 }
 
-function render() {
+function render(){
 
   let total = 0;
 
-  if (data.length === 0) {
+  if(data.length === 0){
 
     document.getElementById("list").innerHTML =
       "Belum ada data";
@@ -145,13 +276,13 @@ function render() {
   let html =
     "<table><tr><th>No</th><th>Nama</th><th>Kategori</th><th>Jumlah</th></tr>";
 
-  data.forEach((d, i) => {
+  data.forEach((d,i)=>{
 
     total += d.jumlah;
 
     html += `
       <tr>
-        <td>${i + 1}</td>
+        <td>${i+1}</td>
         <td>${d.nama}</td>
         <td>${d.kategori}</td>
         <td>${formatRupiah(d.jumlah)}</td>
@@ -161,13 +292,14 @@ function render() {
 
   html += "</table>";
 
-  document.getElementById("list").innerHTML = html;
+  document.getElementById("list").innerHTML =
+    html;
 
   document.getElementById("total").innerText =
     formatRupiah(total);
 }
 
-function tambah() {
+function tambah(){
 
   const nama =
     document.getElementById("nama").value.trim();
@@ -178,7 +310,7 @@ function tambah() {
   const jumlah =
     Number(document.getElementById("jumlah").value);
 
-  if (!nama || !kategori || !jumlah) {
+  if(!nama || !kategori || !jumlah){
 
     alert("Isi semua data");
     return;
@@ -197,9 +329,9 @@ function tambah() {
   render();
 }
 
-async function analisis() {
+async function analisis(){
 
-  if (data.length === 0) {
+  if(data.length === 0){
 
     alert("Belum ada data");
     return;
@@ -214,11 +346,11 @@ async function analisis() {
   let terbesar = 0;
   let kategoriTerbesar = "";
 
-  data.forEach(d => {
+  data.forEach(d=>{
 
     total += d.jumlah;
 
-    if (d.jumlah > terbesar) {
+    if(d.jumlah > terbesar){
 
       terbesar = d.jumlah;
       kategoriTerbesar = d.kategori;
@@ -230,7 +362,7 @@ async function analisis() {
     : total <= 100000 ? "Sedang"
     : "Boros";
 
-  const hasil = `
+  hasilAnalisis = `
 Total Pengeluaran: ${formatRupiah(total)}
 
 Kategori Terbesar:
@@ -241,84 +373,125 @@ Status:
 ${status}
 `;
 
-  try {
+  try{
 
-    // ANALISIS GEMINI
-    const analisisRes = await fetch(
+    const res = await fetch(
       "https://student-expense-analyzer-backend.vercel.app/api/analyze",
       {
-        method: "POST",
+        method:"POST",
 
-        headers: {
-          "Content-Type": "application/json"
+        headers:{
+          "Content-Type":"application/json"
         },
 
-        body: JSON.stringify({
-          activities: hasil
+        body:JSON.stringify({
+          activities: hasilAnalisis
         })
       }
     );
 
-    const analisisData =
-      await analisisRes.json();
+    const aiData = await res.json();
 
-    if (analisisData.result) {
+    if(aiData.result){
+
+      let badge = "";
+
+      if(status === "Hemat"){
+        badge =
+          `<span class="badge hemat">Hemat</span>`;
+      }
+
+      else if(status === "Sedang"){
+        badge =
+          `<span class="badge sedang">Sedang</span>`;
+      }
+
+      else{
+        badge =
+          `<span class="badge boros">Boros</span>`;
+      }
+
+      document.getElementById("result").innerHTML =
+        badge + "<br><br>" + aiData.result;
+
+      // tampilkan tombol generate image
+      document.getElementById("generateBtn")
+        .style.display = "inline-block";
+
+    }else{
 
       document.getElementById("result").innerText =
-        analisisData.result;
-
-    } else {
-
-      document.getElementById("result").innerText =
-        analisisData.error || "AI gagal menganalisis";
+        aiData.error || "AI gagal";
     }
 
-    // GENERATE IMAGE
-    const imageRes = await fetch(
+  }catch(err){
+
+    console.error(err);
+
+    alert("Tidak bisa konek ke backend");
+
+  }finally{
+
+    loading.style.display = "none";
+  }
+}
+
+async function generateImage(){
+
+  if(!hasilAnalisis){
+
+    alert("Lakukan analisis terlebih dahulu");
+    return;
+  }
+
+  const loading =
+    document.getElementById("loading");
+
+  loading.style.display = "block";
+
+  try{
+
+    const res = await fetch(
       "https://student-expense-analyzer-backend.vercel.app/api/generate-images",
       {
-        method: "POST",
+        method:"POST",
 
-        headers: {
-          "Content-Type": "application/json"
+        headers:{
+          "Content-Type":"application/json"
         },
 
-        body: JSON.stringify({
-          expenses: hasil
+        body:JSON.stringify({
+          expenses: hasilAnalisis
         })
       }
     );
 
-    const imageData =
-      await imageRes.json();
+    const imageData = await res.json();
 
-    console.log(imageData);
-
-    if (imageData.image) {
+    if(imageData.image){
 
       const img =
         document.getElementById("aiImage");
 
-      // sekarang langsung URL
       img.src = imageData.image;
 
       img.style.display = "block";
 
-    } else {
+    }else{
 
       alert(
-        "❌ " +
-        (imageData.error || "Gagal membuat gambar")
+        imageData.error ||
+        "Gagal generate gambar"
       );
     }
 
-  } catch (err) {
+  }catch(err){
 
     console.error(err);
 
-    alert("❌ Tidak bisa konek ke backend");
+    alert("Tidak bisa konek ke backend");
 
-  } finally {
+  }finally{
 
     loading.style.display = "none";
   }
